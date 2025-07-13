@@ -20,7 +20,7 @@ body {
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 5vw, 2.5rem);
     margin-bottom: 10px;
 }
 
@@ -53,7 +53,7 @@ select {
 }
 
 #leader-name {
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
     margin: 0;
 }
 
@@ -63,10 +63,13 @@ select {
 
 .countdown-numbers {
     font-family: 'Roboto Mono', monospace;
-    font-size: 4rem;
+    /* ANCIENNE LIGNE : font-size: 4rem; */
+    /* NOUVELLE LIGNE : */
+    font-size: clamp(2.5rem, 10vw, 4.5rem);
     font-weight: 700;
     color: #4CAF50;
     letter-spacing: -2px;
+    word-wrap: break-word; /* On ajoute cette sécurité aussi */
 }
 
 .countdown-label {
@@ -100,4 +103,26 @@ select {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Pour les écrans jusqu'à 600px de large */
+@media (max-width: 600px) {
+    .app-container {
+        /* On réduit les espacements pour gagner de la place */
+        padding: 20px 15px; /* 20px en haut/bas, 15px sur les côtés */
+        width: 95%; /* On prend un peu plus de place sur les petits écrans */
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    #leader-photo {
+        /* On réduit la taille de la photo */
+        width: 100px; 
+        height: 100px;
+    }
+    
+    select {
+        /* On peut légèrement réduire la police du sélecteur */
+        font-size: 0.9rem;
+    }
 }
