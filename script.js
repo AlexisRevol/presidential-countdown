@@ -20,10 +20,32 @@ class CountdownApp {
 
         // Data configuration
         this.countryRules = {
-            "Q142": { name: "France", mandateLengthYears: 5, positionId: "P35" },
-            "Q30": { name: "États-Unis", mandateLengthYears: 4, positionId: "P35" },
-            "Q155": { name: "Brésil", mandateLengthYears: 4, positionId: "P35" },
-            "Q183": { name: "Allemagne", mandateLengthYears: 4, positionId: "P36" }
+            // --- AMÉRIQUES ---
+            "Q30": { name: "États-Unis", mandateLengthYears: 4, positionId: "P35" }, // Président
+            "Q16": { name: "Canada", mandateLengthYears: 4, positionId: "P36" }, // Premier Ministre (mandat législatif, généralement 4 ans)
+            "Q96": { name: "Mexique", mandateLengthYears: 6, positionId: "P35" }, // Président (mandat de 6 ans non renouvelable)
+            "Q155": { name: "Brésil", mandateLengthYears: 4, positionId: "P35" }, // Président
+            "Q414": { name: "Argentine", mandateLengthYears: 4, positionId: "P35" }, // Président
+
+            // --- EUROPE ---
+            "Q142": { name: "France", mandateLengthYears: 5, positionId: "P35" }, // Président
+            "Q183": { name: "Allemagne", mandateLengthYears: 4, positionId: "P36" }, // Chancelier (mandat législatif)
+            "Q145": { name: "Royaume-Uni", mandateLengthYears: 5, positionId: "P36" }, // Premier Ministre (mandat législatif max 5 ans)
+            "Q38": { name: "Italie", mandateLengthYears: 5, positionId: "P36" }, // Président du Conseil des ministres (Premier Ministre)
+            "Q29": { name: "Espagne", mandateLengthYears: 4, positionId: "P36" }, // Président du gouvernement (Premier Ministre)
+            "Q159": { name: "Russie", mandateLengthYears: 6, positionId: "P35" }, // Président
+            "Q34": { name: "Suède", mandateLengthYears: 4, positionId: "P36" }, // Premier Ministre
+
+            // --- ASIE ---
+            "Q17": { name: "Japon", mandateLengthYears: 4, positionId: "P36" }, // Premier Ministre (mandat législatif)
+            "Q668": { name: "Inde", mandateLengthYears: 5, positionId: "P36" }, // Premier Ministre
+            "Q408": { name: "Australie", mandateLengthYears: 3, positionId: "P36" }, // Premier Ministre (mandat législatif)
+            "Q884": { name: "Corée du Sud", mandateLengthYears: 5, positionId: "P35" }, // Président
+
+            // --- AFRIQUE ---
+            "Q115": { name: "Afrique du Sud", mandateLengthYears: 5, positionId: "P35" }, // Président
+            "Q962": { name: "Bénin", mandateLengthYears: 5, positionId: "P35" }, // Président
+            "Q1032": { name: "Nigéria", mandateLengthYears: 4, positionId: "P35" }, // Président
         };
 
         this.populateCountries();
