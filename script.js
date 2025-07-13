@@ -20,32 +20,33 @@ class CountdownApp {
 
         // Data configuration
         this.countryRules = {
-            // --- AMÉRIQUES ---
-            "Q30": { name: "États-Unis", mandateLengthYears: 4, positionId: "P35" }, // Président
-            "Q16": { name: "Canada", mandateLengthYears: 4, positionId: "P36" }, // Premier Ministre (mandat législatif, généralement 4 ans)
-            "Q96": { name: "Mexique", mandateLengthYears: 6, positionId: "P35" }, // Président (mandat de 6 ans non renouvelable)
-            "Q155": { name: "Brésil", mandateLengthYears: 4, positionId: "P35" }, // Président
-            "Q414": { name: "Argentine", mandateLengthYears: 4, positionId: "P35" }, // Président
-
+            // --- AMÉRIQUES (Systèmes présidentiels, P35 est le bon choix) ---
+            "Q30": { name: "États-Unis", mandateLengthYears: 4, positionId: "P35" },
+            "Q96": { name: "Mexique", mandateLengthYears: 6, positionId: "P35" },
+            "Q155": { name: "Brésil", mandateLengthYears: 4, positionId: "P35" },
+            "Q414": { name: "Argentine", mandateLengthYears: 4, positionId: "P35" },
+            
             // --- EUROPE ---
-            "Q142": { name: "France", mandateLengthYears: 5, positionId: "P35" }, // Président
-            "Q183": { name: "Allemagne", mandateLengthYears: 4, positionId: "P36" }, // Chancelier (mandat législatif)
-            "Q145": { name: "Royaume-Uni", mandateLengthYears: 5, positionId: "P36" }, // Premier Ministre (mandat législatif max 5 ans)
-            "Q38": { name: "Italie", mandateLengthYears: 5, positionId: "P36" }, // Président du Conseil des ministres (Premier Ministre)
-            "Q29": { name: "Espagne", mandateLengthYears: 4, positionId: "P36" }, // Président du gouvernement (Premier Ministre)
-            "Q159": { name: "Russie", mandateLengthYears: 6, positionId: "P35" }, // Président
-            "Q34": { name: "Suède", mandateLengthYears: 4, positionId: "P36" }, // Premier Ministre
+            "Q142": { name: "France", mandateLengthYears: 5, positionId: "P35" },
+            "Q159": { name: "Russie", mandateLengthYears: 6, positionId: "P35" },
+            "Q183": { name: "Allemagne", mandateLengthYears: 5, positionId: "P35" }, // Président (rôle cérémoniel, mais données fiables)
+            "Q38": { name: "Italie", mandateLengthYears: 7, positionId: "P35" }, // Président (données fiables)
 
+            // --- MONARCHIES CONSTITUTIONNELLES (P36 est chaotique, P35 pour le Monarque est plus fiable) ---
+            "Q145": { name: "Royaume-Uni", mandateLengthYears: 70, positionId: "P35", overrideMandate: true }, // Le "mandat" d'un monarque est à vie. On met une durée symbolique longue.
+            "Q29": { name: "Espagne", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
+            "Q16": { name: "Canada", mandateLengthYears: 70, positionId: "P35", overrideMandate: true }, // Le Roi Charles III est aussi le Chef d'État du Canada.
+            "Q17": { name: "Japon", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
+            "Q408": { name: "Australie", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
+            
             // --- ASIE ---
-            "Q17": { name: "Japon", mandateLengthYears: 4, positionId: "P36" }, // Premier Ministre (mandat législatif)
-            "Q668": { name: "Inde", mandateLengthYears: 5, positionId: "P36" }, // Premier Ministre
-            "Q408": { name: "Australie", mandateLengthYears: 3, positionId: "P36" }, // Premier Ministre (mandat législatif)
-            "Q884": { name: "Corée du Sud", mandateLengthYears: 5, positionId: "P35" }, // Président
+            "Q668": { name: "Inde", mandateLengthYears: 5, positionId: "P35" }, // Président (données fiables)
+            "Q884": { name: "Corée du Sud", mandateLengthYears: 5, positionId: "P35" },
 
             // --- AFRIQUE ---
-            "Q115": { name: "Afrique du Sud", mandateLengthYears: 5, positionId: "P35" }, // Président
-            "Q962": { name: "Bénin", mandateLengthYears: 5, positionId: "P35" }, // Président
-            "Q1032": { name: "Nigéria", mandateLengthYears: 4, positionId: "P35" }, // Président
+            "Q115": { name: "Afrique du Sud", mandateLengthYears: 5, positionId: "P35" },
+            "Q962": { name: "Bénin", mandateLengthYears: 5, positionId: "P35" },
+            "Q1032": { name: "Nigéria", mandateLengthYears: 4, positionId: "P35" },
         };
 
         this.populateCountries();
@@ -59,13 +60,27 @@ class CountdownApp {
 
     // Fill menu
     populateCountries() {
-        for (const countryId in this.countryRules) {
-            const option = document.createElement('option');
-            option.value = countryId;
-            option.textContent = this.countryRules[countryId].name;
-            this.countrySelect.appendChild(option);
-        }
-    }
+        // 1. Transformer l'objet des règles en un tableau d'objets [ {id, name}, ... ]
+        const countriesArray = Object.keys(this.countryRules).map(countryId => {
+            return {
+                id: countryId,
+                name: this.countryRules[countryId].name
+            };
+        });
+
+    // 2. Trier ce tableau par ordre alphabétique des noms de pays.
+    // localeCompare est la meilleure méthode pour trier des chaînes de caractères,
+    // car elle gère correctement les accents (ex: "États-Unis").
+    countriesArray.sort((a, b) => a.name.localeCompare(b.name));
+
+    // 3. Remplir le select avec le tableau trié
+    countriesArray.forEach(country => {
+        const option = document.createElement('option');
+        option.value = country.id;
+        option.textContent = country.name;
+        this.countrySelect.appendChild(option);
+    });
+}
 
     // Called on country change
     async handleCountryChange(event) {
@@ -101,49 +116,76 @@ class CountdownApp {
         }
     }
 
-    async getLeaderData(countryId) {
+        async getLeaderData(countryId) {
         const rules = this.countryRules[countryId];
         if (!rules) throw new Error("No rules defined for this country.");
 
-        // Get leader data from Wikidata
-        const sparqlQuery = `
-            SELECT ?leaderLabel ?photo ?startTime WHERE {
+        let sparqlQuery = `
+            SELECT ?leader ?leaderLabel ?photo ?startTime WHERE {
               wd:${countryId} p:${rules.positionId} ?statement.
               ?statement ps:${rules.positionId} ?leader.
               ?statement pq:P580 ?startTime.
               OPTIONAL { ?leader wdt:P18 ?photo. }
+              OPTIONAL { ?statement pq:P582 ?endTime. }
+              FILTER(!BOUND(?endTime) || ?endTime > NOW())
               SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en". }
-            } 
-            ORDER BY DESC(?startTime) 
-            LIMIT 1`;
+            } ORDER BY DESC(?startTime) LIMIT 1`;
 
-        const endpointUrl = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
-        const response = await fetch(endpointUrl, { headers: { 'Accept': 'application/json' } });
+        let endpointUrl = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
+        let response = await fetch(endpointUrl, { headers: { 'Accept': 'application/json' } });
+        if (!response.ok) throw new Error('Network error.');
+        
+        let data = await response.json();
 
-        if (!response.ok) throw new Error('Network error when requesting Wikidata.');
-        
-        const data = await response.json();
-        
-        if (!data?.results?.bindings || data.results.bindings.length === 0) {
-            throw new Error("Impossible to find a leader with a start date on Wikidata.");
+        if (data?.results?.bindings?.length > 0) {
+            return this.processLeaderData(data.results.bindings[0], rules);
         }
 
-        const result = data.results.bindings[0];
+        sparqlQuery = `
+            SELECT ?leader ?leaderLabel ?photo ?startTime WHERE {
+              wd:${countryId} p:${rules.positionId} ?statement.
+              ?statement ps:${rules.positionId} ?leader.
+              OPTIONAL { ?statement pq:P582 ?endTimeOnCountryPage. }
+              FILTER(!BOUND(?endTimeOnCountryPage) || ?endTimeOnCountryPage > NOW())
+
+              ?leader p:P39 ?positionStatement.
+              
+              OPTIONAL { ?positionStatement pq:P582 ?endTimeOnLeaderPage. } 
+              FILTER(!BOUND(?endTimeOnLeaderPage) || ?endTimeOnLeaderPage > NOW())
+
+              ?positionStatement pq:P580 ?startTime.
+              
+              OPTIONAL { ?leader wdt:P18 ?photo. }
+              SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en". }
+            } ORDER BY DESC(?startTime) LIMIT 1`;
+            
+        endpointUrl = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
+        response = await fetch(endpointUrl, { headers: { 'Accept': 'application/json' } });
+        if (!response.ok) throw new Error('Network error.');
+        
+        data = await response.json();
+
+        if (data?.results?.bindings?.length > 0) {
+            return this.processLeaderData(data.results.bindings[0], rules);
+        }
+
+        throw new Error("Unable to find executive data after two attempts.");
+    }
+
+    processLeaderData(result, rules) {
         const mandateYears = rules.mandateLengthYears;
         const now = new Date();
-
-
+        
         let startDate = new Date(result.startTime.value);
         let endDate = new Date(startDate);
         endDate.setFullYear(endDate.getFullYear() + mandateYears);
 
-        // As long as this end date is in the past, we move forward one term.
         while (endDate < now) {
             startDate = endDate;
             endDate = new Date(startDate);
             endDate.setFullYear(endDate.getFullYear() + mandateYears);
         }
-
+        
         return {
             name: result.leaderLabel.value,
             photoUrl: result.photo ? result.photo.value : 'https://via.placeholder.com/150',
