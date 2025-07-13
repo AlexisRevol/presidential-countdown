@@ -20,7 +20,7 @@ class CountdownApp {
 
         // Data configuration
         this.countryRules = {
-            // --- AMÉRIQUES (Systèmes présidentiels, P35 est le bon choix) ---
+            // --- AMERICAS (Presidential systems) ---
             "Q30": { name: "États-Unis", mandateLengthYears: 4, positionId: "P35" },
             "Q96": { name: "Mexique", mandateLengthYears: 6, positionId: "P35" },
             "Q155": { name: "Brésil", mandateLengthYears: 4, positionId: "P35" },
@@ -32,15 +32,15 @@ class CountdownApp {
             "Q183": { name: "Allemagne", mandateLengthYears: 5, positionId: "P35" }, // Président (rôle cérémoniel, mais données fiables)
             "Q38": { name: "Italie", mandateLengthYears: 7, positionId: "P35" }, // Président (données fiables)
 
-            // --- MONARCHIES CONSTITUTIONNELLES (P36 est chaotique, P35 pour le Monarque est plus fiable) ---
-            "Q145": { name: "Royaume-Uni", mandateLengthYears: 70, positionId: "P35", overrideMandate: true }, // Le "mandat" d'un monarque est à vie. On met une durée symbolique longue.
+            // --- CONSTITUTIONAL MONARCHIES (P35 for the Monarch is more reliable) ---
+            "Q145": { name: "Royaume-Uni", mandateLengthYears: 70, positionId: "P35", overrideMandate: true }, 
             "Q29": { name: "Espagne", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
-            "Q16": { name: "Canada", mandateLengthYears: 70, positionId: "P35", overrideMandate: true }, // Le Roi Charles III est aussi le Chef d'État du Canada.
+            "Q16": { name: "Canada", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
             "Q17": { name: "Japon", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
             "Q408": { name: "Australie", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
             
             // --- ASIE ---
-            "Q668": { name: "Inde", mandateLengthYears: 5, positionId: "P35" }, // Président (données fiables)
+            "Q668": { name: "Inde", mandateLengthYears: 5, positionId: "P35" }, 
             "Q884": { name: "Corée du Sud", mandateLengthYears: 5, positionId: "P35" },
 
             // --- AFRIQUE ---
@@ -60,7 +60,6 @@ class CountdownApp {
 
     // Fill menu
     populateCountries() {
-        // 1. Transformer l'objet des règles en un tableau d'objets [ {id, name}, ... ]
         const countriesArray = Object.keys(this.countryRules).map(countryId => {
             return {
                 id: countryId,
@@ -68,19 +67,14 @@ class CountdownApp {
             };
         });
 
-    // 2. Trier ce tableau par ordre alphabétique des noms de pays.
-    // localeCompare est la meilleure méthode pour trier des chaînes de caractères,
-    // car elle gère correctement les accents (ex: "États-Unis").
-    countriesArray.sort((a, b) => a.name.localeCompare(b.name));
-
-    // 3. Remplir le select avec le tableau trié
-    countriesArray.forEach(country => {
-        const option = document.createElement('option');
-        option.value = country.id;
-        option.textContent = country.name;
-        this.countrySelect.appendChild(option);
-    });
-}
+        countriesArray.sort((a, b) => a.name.localeCompare(b.name));
+        countriesArray.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country.id;
+            option.textContent = country.name;
+            this.countrySelect.appendChild(option);
+        });
+    }
 
     // Called on country change
     async handleCountryChange(event) {
