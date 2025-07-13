@@ -25,6 +25,7 @@ class CountdownApp {
 
         // 2. On stocke l'état de l'application (les variables qui changent)
         this.countdownInterval = null;
+        this.cache = {};
 
         // 3. On stocke la configuration (données qui ne changent pas)
         this.countryRules = {
@@ -76,8 +77,16 @@ class CountdownApp {
         this.errorMessage.classList.add('hidden');
 
         try {
-            const leaderData = await this.getLeaderData(countryId);
-            this.displayData(leaderData);
+            // VÉRIFICATION DU CACHE
+            if (this.cache[countryId]) {
+                console.log(`Données trouvées dans le cache pour ${countryId}.`);
+                this.displayData(this.cache[countryId]);
+            } else {
+                console.log(`Données non trouvées dans le cache pour ${countryId}. Requête API.`);
+                const leaderData = await this.getLeaderData(countryId);
+                this.cache[countryId] = leaderData; // <-- MISE EN CACHE
+                this.displayData(leaderData);
+            }
         } catch (error) {
             console.error("Erreur:", error);
             this.errorMessage.textContent = `Impossible de récupérer les données. ${error.message}`;
@@ -85,7 +94,6 @@ class CountdownApp {
             this.loader.classList.add('hidden');
         }
     }
-
         async getLeaderData(countryId) {
         const rules = this.countryRules[countryId];
         if (!rules) throw new Error("Aucune règle définie pour ce pays.");
@@ -196,16 +204,40 @@ class CountdownApp {
     }
 
     // Méthode pour afficher les données et lancer le timer
-    displayData(data) {
+     displayData(data) {
+        // Affiche immédiatement les informations textuelles
         this.leaderNameEl.textContent = data.name;
-        this.leaderPhotoEl.src = data.photoUrl;
-        
         const endDate = new Date(data.endDate);
         this.endDateInfoEl.textContent = `Fin du mandat le ${endDate.toLocaleDateString('fr-FR')}`;
 
+        // Masque la photo précédente et affiche une version floue/temporaire
+        this.leaderPhotoEl.style.opacity = 0.5;
+        this.leaderPhotoEl.style.filter = 'blur(5px)';
+
+        // Pré-charge la nouvelle image en mémoire
+        const img = new Image();
+        img.src = data.photoUrl;
+
+        // Quand l'image est complètement chargée...
+        img.onload = () => {
+            // ... on met à jour la source de la photo sur la page...
+            this.leaderPhotoEl.src = data.photoUrl;
+            // ... et on la fait apparaître avec une transition douce.
+            this.leaderPhotoEl.style.opacity = 1;
+            this.leaderPhotoEl.style.filter = 'blur(0)';
+        };
+        // Si l'image n'arrive pas à charger, on affiche l'image par défaut
+        img.onerror = () => {
+            this.leaderPhotoEl.src = 'https://via.placeholder.com/150';
+            this.leaderPhotoEl.style.opacity = 1;
+            this.leaderPhotoEl.style.filter = 'blur(0)';
+        };
+
+        // Le timer, lui, peut commencer tout de suite
         this.updateCountdown(endDate);
         this.countdownInterval = setInterval(() => this.updateCountdown(endDate), 1000);
 
+        // On affiche le conteneur principal
         this.loader.classList.add('hidden');
         this.countdownContainer.classList.remove('hidden');
     }
