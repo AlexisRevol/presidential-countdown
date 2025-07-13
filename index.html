@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compte à Rebours Présidentiel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <h1>Compte à Rebours Présidentiel</h1>
+        <p>Combien de temps reste-t-il au chef d'État actuel ?</p>
+        
+        <select id="country-select">
+            <option value="">-- Choisissez un pays --</option>
+            <!-- Les options seront ajoutées par JavaScript -->
+        </select>
+
+        <div id="countdown-container" class="hidden">
+            <div id="leader-info">
+                <img id="leader-photo" src="" alt="Photo du dirigeant">
+                <h2 id="leader-name"></h2>
+            </div>
+            <div id="timer">
+                <p id="seconds-left" class="countdown-numbers"></p>
+                <p id="countdown-label" class="countdown-label">secondes restantes</p>
+            </div>
+            <div id="full-countdown">
+                <!-- Un compte à rebours plus détaillé (j/h/m/s) -->
+            </div>
+            <small id="end-date-info"></small>
+        </div>
+
+        <div id="loading-spinner" class="hidden"></div>
+        <div id="error-message" class="hidden"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
