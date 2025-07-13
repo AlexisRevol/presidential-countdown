@@ -6,7 +6,7 @@ A web application that displays a real-time countdown to the end of a head of st
 
 **➡️ [Try it](https://AlexisRevol.github.io/presidential-countdown)** 
 
-![Application Screenshot](https://AlexisRevol.github.io/presidential-countdown/demo_screenshot.png)
+<img src="https://AlexisRevol.github.io/presidential-countdown/demo_screenshot.png" alt="Application Screenshot" width="400"/>
 
 ---
 
