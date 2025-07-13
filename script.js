@@ -90,17 +90,13 @@ class CountdownApp {
         const rules = this.countryRules[countryId];
         if (!rules) throw new Error("Aucune règle définie pour ce pays.");
 
-        // La requête ne change pas, elle nous donne bien le premier mandat du dirigeant actuel.
+        // REQUÊTE SIMPLIFIÉE : On veut juste le dirigeant avec la date de début la plus récente.
+        // C'est notre point de départ le plus fiable. On ignore volontairement la date de fin ici.
         const sparqlQuery = `
             SELECT ?leaderLabel ?photo ?startTime WHERE {
               wd:${countryId} p:${rules.positionId} ?statement.
               ?statement ps:${rules.positionId} ?leader.
               ?statement pq:P580 ?startTime.
-              
-              # On prend le dirigeant actuel en filtrant ceux dont le mandat est terminé (si endTime est présent)
-              OPTIONAL { ?statement pq:P582 ?endTime. }
-              FILTER(!BOUND(?endTime) || ?endTime > NOW())
-              
               OPTIONAL { ?leader wdt:P18 ?photo. }
               SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en". }
             } 
@@ -113,19 +109,38 @@ class CountdownApp {
         if (!response.ok) throw new Error('Erreur réseau lors de la requête à Wikidata.');
         
         const data = await response.json();
-        if (data.results.bindings.length === 0) {
-            // Si on ne trouve rien, on retente avec une requête plus simple qui ne filtre pas les mandats finis.
-            // C'est notre plan B pour le cas de Macron.
-            return this.getLeaderDataFallback(countryId, rules);
+        
+        // Vérification sécurisée unique
+        if (!data?.results?.bindings || data.results.bindings.length === 0) {
+            throw new Error("Impossible de trouver un dirigeant avec une date de début sur Wikidata.");
         }
 
         const result = data.results.bindings[0];
+        const mandateYears = rules.mandateLengthYears;
+        const now = new Date();
+
+        // --- LA LOGIQUE DE "FAST-FORWARD" EST MAINTENANT LA LOGIQUE PRINCIPALE ---
         
-        // La logique de calcul reste la même, car cette requête devrait retourner le bon mandat (2022).
-        const startDate = new Date(result.startTime.value);
-        const endDate = new Date(startDate);
-        endDate.setFullYear(startDate.getFullYear() + rules.mandateLengthYears);
+        // 1. On part de la date de début que Wikidata nous donne (ex: 2017)
+        let startDate = new Date(result.startTime.value);
+
+        // 2. On calcule une première date de fin potentielle (ex: 2022)
+        let endDate = new Date(startDate);
+        endDate.setFullYear(endDate.getFullYear() + mandateYears);
+
+        // 3. TANT QUE cette date de fin est dans le passé, on avance d'un mandat.
+        while (endDate < now) {
+            console.log(`Mandat terminé le ${endDate.toLocaleDateString()} détecté. Passage au suivant.`);
+            // La nouvelle date de début est l'ancienne date de fin.
+            startDate = endDate;
+            // On recalcule la nouvelle date de fin.
+            endDate = new Date(startDate);
+            endDate.setFullYear(endDate.getFullYear() + mandateYears);
+        }
         
+        // 4. À la sortie de la boucle, 'endDate' est forcément la bonne date de fin du mandat actuel.
+        console.log(`Date de fin de mandat actuelle calculée : ${endDate.toLocaleDateString()}`);
+
         return {
             name: result.leaderLabel.value,
             photoUrl: result.photo ? result.photo.value : 'https://via.placeholder.com/150',
@@ -179,7 +194,7 @@ class CountdownApp {
             endDate: endDate.toISOString()
         };
     }
-    
+
     // Méthode pour afficher les données et lancer le timer
     displayData(data) {
         this.leaderNameEl.textContent = data.name;
