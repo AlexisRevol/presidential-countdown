@@ -110,7 +110,7 @@ class CountdownApp {
         }
     }
 
-        async getLeaderData(countryId) {
+    async getLeaderData(countryId) {
         const rules = this.countryRules[countryId];
         if (!rules) throw new Error("No rules defined for this country.");
 
@@ -234,7 +234,7 @@ class CountdownApp {
      displayData(data) {
         this.leaderNameEl.textContent = data.name;
         const endDate = new Date(data.endDate);
-        this.endDateInfoEl.textContent = `Fin du mandat le ${endDate.toLocaleDateString('fr-FR')}`;
+        this.endDateInfoEl.textContent = `Mandate ends on ${endDate.toLocaleDateString('fr-FR')}`;
 
         this.leaderPhotoEl.style.opacity = 0.5;
         this.leaderPhotoEl.style.filter = 'blur(5px)';
