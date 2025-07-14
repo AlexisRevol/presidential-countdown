@@ -1,7 +1,3 @@
-document.addEventListener('DOMContentLoaded', () => {
-    new CountdownApp();
-});
-
 class CountdownApp {
     constructor() { 
         this.countrySelect = document.getElementById('country-select');
@@ -11,54 +7,60 @@ class CountdownApp {
         this.leaderNameEl = document.getElementById('leader-name');
         this.leaderPhotoEl = document.getElementById('leader-photo');
         this.endDateInfoEl = document.getElementById('end-date-info');
+        
+        // MODIFIÉ : Séparation des éléments du timer pour un contrôle plus fin
+        this.timerEl = document.getElementById('timer');
         this.secondsLeftEl = document.getElementById('seconds-left');
-        this.countdownLabelEl = document.getElementById('countdown-label'); // Corrigé ici pour ID
+        this.countdownLabelEl = document.getElementById('countdown-label');
         this.fullCountdownEl = document.getElementById('full-countdown');
 
         this.countdownInterval = null;
         this.cache = {};
 
-        // Data configuration
+        // --- MODIFICATION DE LA CONFIGURATION ---
+        // J'ai ajouté une propriété `termType`.
+        // 'fixed' pour un mandat à durée déterminée.
+        // 'unlimited' pour les monarchies ou dirigeants à vie.
         this.countryRules = {
             // --- AMERICAS (Presidential systems) ---
-            "Q30": { name: "États-Unis", mandateLengthYears: 4, positionId: "P35" },
-            "Q96": { name: "Mexique", mandateLengthYears: 6, positionId: "P35" },
-            "Q155": { name: "Brésil", mandateLengthYears: 4, positionId: "P35" },
-            "Q414": { name: "Argentine", mandateLengthYears: 4, positionId: "P35" },
+            "Q30": { name: "États-Unis", mandateLengthYears: 4, positionId: "P35", termType: 'fixed' },
+            "Q96": { name: "Mexique", mandateLengthYears: 6, positionId: "P35", termType: 'fixed' },
+            "Q155": { name: "Brésil", mandateLengthYears: 4, positionId: "P35", termType: 'fixed' },
+            "Q414": { name: "Argentine", mandateLengthYears: 4, positionId: "P35", termType: 'fixed' },
             
             // --- EUROPE ---
-            "Q142": { name: "France", mandateLengthYears: 5, positionId: "P35" },
-            "Q159": { name: "Russie", mandateLengthYears: 6, positionId: "P35" },
-            "Q183": { name: "Allemagne", mandateLengthYears: 5, positionId: "P35" }, // Président (rôle cérémoniel, mais données fiables)
-            "Q38": { name: "Italie", mandateLengthYears: 7, positionId: "P35" }, // Président (données fiables)
+            "Q142": { name: "France", mandateLengthYears: 5, positionId: "P35", termType: 'fixed' },
+            "Q159": { name: "Russie", mandateLengthYears: 6, positionId: "P35", termType: 'fixed' },
+            "Q183": { name: "Allemagne", mandateLengthYears: 5, positionId: "P35", termType: 'fixed' },
+            "Q38": { name: "Italie", mandateLengthYears: 7, positionId: "P35", termType: 'fixed' },
 
-            // --- CONSTITUTIONAL MONARCHIES (P35 for the Monarch is more reliable) ---
-            "Q145": { name: "Royaume-Uni", mandateLengthYears: 70, positionId: "P35", overrideMandate: true }, 
-            "Q29": { name: "Espagne", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
-            "Q16": { name: "Canada", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
-            "Q17": { name: "Japon", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
-            "Q408": { name: "Australie", mandateLengthYears: 70, positionId: "P35", overrideMandate: true },
+            // --- MONARCHIES & RÉGIMES À DURÉE INDÉTERMINÉE ---
+            // On utilise maintenant termType: 'unlimited'
+            "Q145": { name: "Royaume-Uni", positionId: "P35", termType: 'unlimited' }, 
+            "Q29": { name: "Espagne", positionId: "P35", termType: 'unlimited' },
+            "Q16": { name: "Canada", positionId: "P35", termType: 'unlimited' },
+            "Q17": { name: "Japon", positionId: "P35", termType: 'unlimited' },
+            "Q408": { name: "Australie", positionId: "P35", termType: 'unlimited' },
+            "Q423": { name: "Corée du Nord", positionId: "P6", termType: 'unlimited' }, // P6 = chef d'état
             
             // --- ASIE ---
-            "Q668": { name: "Inde", mandateLengthYears: 5, positionId: "P35" }, 
-            "Q884": { name: "Corée du Sud", mandateLengthYears: 5, positionId: "P35" },
+            "Q668": { name: "Inde", mandateLengthYears: 5, positionId: "P35", termType: 'fixed' }, 
+            "Q884": { name: "Corée du Sud", mandateLengthYears: 5, positionId: "P35", termType: 'fixed' },
 
             // --- AFRIQUE ---
-            "Q115": { name: "Afrique du Sud", mandateLengthYears: 5, positionId: "P35" },
-            "Q962": { name: "Bénin", mandateLengthYears: 5, positionId: "P35" },
-            "Q1032": { name: "Nigéria", mandateLengthYears: 4, positionId: "P35" },
+            "Q115": { name: "Afrique du Sud", mandateLengthYears: 5, positionId: "P35", termType: 'fixed' },
+            "Q962": { name: "Bénin", mandateLengthYears: 5, positionId: "P35", termType: 'fixed' },
+            "Q1032": { name: "Nigéria", mandateLengthYears: 4, positionId: "P35", termType: 'fixed' },
         };
 
         this.populateCountries();
         this.addEventListeners();
     }
 
-    // Link event to action
     addEventListeners() {
         this.countrySelect.addEventListener('change', this.handleCountryChange.bind(this));
     }
 
-    // Fill menu
     populateCountries() {
         const countriesArray = Object.keys(this.countryRules).map(countryId => {
             return {
@@ -76,7 +78,6 @@ class CountdownApp {
         });
     }
 
-    // Called on country change
     async handleCountryChange(event) {
         const countryId = event.target.value;
 
@@ -95,26 +96,31 @@ class CountdownApp {
         this.errorMessage.classList.add('hidden');
 
         try {
-            if (this.cache[countryId]) {
-                this.displayData(this.cache[countryId]);
-            } else {
-                const leaderData = await this.getLeaderData(countryId);
-                this.cache[countryId] = leaderData; // <-- MISE EN CACHE
-                this.displayData(leaderData);
+            // Le cache fonctionne toujours de la même manière
+            const leaderData = this.cache[countryId] 
+                ? this.cache[countryId] 
+                : await this.getLeaderData(countryId);
+
+            if (!this.cache[countryId]) {
+                this.cache[countryId] = leaderData;
             }
+            this.displayData(leaderData);
+
         } catch (error) {
             console.error("Error:", error);
-            this.errorMessage.textContent = `Unable to retrieve data. ${error.message}`;
+            this.errorMessage.textContent = `Impossible de récupérer les données. ${error.message}`;
             this.errorMessage.classList.remove('hidden');
+        } finally {
             this.loader.classList.add('hidden');
         }
     }
 
     async getLeaderData(countryId) {
         const rules = this.countryRules[countryId];
-        if (!rules) throw new Error("No rules defined for this country.");
+        if (!rules) throw new Error("Aucune règle définie pour ce pays.");
 
-        let sparqlQuery = `
+        // La requête SPARQL reste la même, elle cherche toujours le dirigeant actuel.
+        const sparqlQuery = `
             SELECT ?leader ?leaderLabel ?photo ?startTime WHERE {
               wd:${countryId} p:${rules.positionId} ?statement.
               ?statement ps:${rules.positionId} ?leader.
@@ -125,141 +131,105 @@ class CountdownApp {
               SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en". }
             } ORDER BY DESC(?startTime) LIMIT 1`;
 
-        let endpointUrl = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
-        let response = await fetch(endpointUrl, { headers: { 'Accept': 'application/json' } });
-        if (!response.ok) throw new Error('Network error.');
-        
-        let data = await response.json();
-
-        if (data?.results?.bindings?.length > 0) {
-            return this.processLeaderData(data.results.bindings[0], rules);
-        }
-
-        sparqlQuery = `
-            SELECT ?leader ?leaderLabel ?photo ?startTime WHERE {
-              wd:${countryId} p:${rules.positionId} ?statement.
-              ?statement ps:${rules.positionId} ?leader.
-              OPTIONAL { ?statement pq:P582 ?endTimeOnCountryPage. }
-              FILTER(!BOUND(?endTimeOnCountryPage) || ?endTimeOnCountryPage > NOW())
-
-              ?leader p:P39 ?positionStatement.
-              
-              OPTIONAL { ?positionStatement pq:P582 ?endTimeOnLeaderPage. } 
-              FILTER(!BOUND(?endTimeOnLeaderPage) || ?endTimeOnLeaderPage > NOW())
-
-              ?positionStatement pq:P580 ?startTime.
-              
-              OPTIONAL { ?leader wdt:P18 ?photo. }
-              SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en". }
-            } ORDER BY DESC(?startTime) LIMIT 1`;
-            
-        endpointUrl = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
-        response = await fetch(endpointUrl, { headers: { 'Accept': 'application/json' } });
-        if (!response.ok) throw new Error('Network error.');
-        
-        data = await response.json();
-
-        if (data?.results?.bindings?.length > 0) {
-            return this.processLeaderData(data.results.bindings[0], rules);
-        }
-
-        throw new Error("Unable to find executive data after two attempts.");
-    }
-
-    processLeaderData(result, rules) {
-        const mandateYears = rules.mandateLengthYears;
-        const now = new Date();
-        
-        let startDate = new Date(result.startTime.value);
-        let endDate = new Date(startDate);
-        endDate.setFullYear(endDate.getFullYear() + mandateYears);
-
-        while (endDate < now) {
-            startDate = endDate;
-            endDate = new Date(startDate);
-            endDate.setFullYear(endDate.getFullYear() + mandateYears);
-        }
-        
-        return {
-            name: result.leaderLabel.value,
-            photoUrl: result.photo ? result.photo.value : 'https://via.placeholder.com/150',
-            endDate: endDate.toISOString()
-        };
-    }
-
-    // Fallback method if no data found in previous one
-    async getLeaderDataFallback(countryId, rules) {
-        console.warn("Main request failed, use fallback method.");
-        const sparqlQuery = `
-            SELECT ?leaderLabel ?photo ?startTime WHERE {
-              wd:${countryId} p:${rules.positionId} ?statement.
-              ?statement ps:${rules.positionId} ?leader.
-              ?statement pq:P580 ?startTime.
-              OPTIONAL { ?leader wdt:P18 ?photo. }
-              SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en". }
-            } 
-            ORDER BY DESC(?startTime) 
-            LIMIT 1`;
-        
         const endpointUrl = `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparqlQuery)}&format=json`;
         const response = await fetch(endpointUrl, { headers: { 'Accept': 'application/json' } });
-        if (!response.ok) throw new Error('The fallback request also failed.');
+        if (!response.ok) throw new Error('Erreur réseau lors de la récupération des données.');
         
         const data = await response.json();
-        if (data.results.bindings.length === 0) {
-            throw new Error("Impossible to find a manager, even with the rescue method.");
+
+        if (data?.results?.bindings?.length > 0) {
+            // On passe les règles à la fonction de traitement
+            return this.processLeaderData(data.results.bindings[0], rules);
         }
 
-        const result = data.results.bindings[0];
+        throw new Error("Impossible de trouver les données du dirigeant actuel.");
+    }
+    
+    // --- MODIFICATION DU TRAITEMENT DES DONNÉES ---
+    processLeaderData(result, rules) {
+        // Si le type de mandat est 'unlimited', on ne calcule pas de date de fin.
+        if (rules.termType === 'unlimited') {
+            return {
+                name: result.leaderLabel.value,
+                photoUrl: result.photo ? result.photo.value : 'https://via.placeholder.com/150',
+                termType: 'unlimited' // On propage cette information
+            };
+        }
+
+        // Sinon, on effectue le calcul habituel pour les mandats à durée fixe.
         const mandateYears = rules.mandateLengthYears;
         const now = new Date();
-
+        
         let startDate = new Date(result.startTime.value);
         let endDate = new Date(startDate);
         endDate.setFullYear(endDate.getFullYear() + mandateYears);
 
+        // Cette boucle est utile pour les présidents réélus
         while (endDate < now) {
             startDate = endDate;
             endDate = new Date(startDate);
             endDate.setFullYear(endDate.getFullYear() + mandateYears);
         }
-
+        
         return {
             name: result.leaderLabel.value,
             photoUrl: result.photo ? result.photo.value : 'https://via.placeholder.com/150',
-            endDate: endDate.toISOString()
+            endDate: endDate.toISOString(),
+            termType: 'fixed' // On propage cette information
         };
     }
+    
+    // --- MODIFICATION MAJEURE DE L'AFFICHAGE ---
+    displayData(data) {
+        // On nettoie l'état précédent (surtout pour l'animation)
+        this.secondsLeftEl.classList.remove('unlimited-term');
+        this.secondsLeftEl.classList.add('countdown-numbers');
 
-     displayData(data) {
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+        }
+
+        // Affichage des informations communes
         this.leaderNameEl.textContent = data.name;
-        const endDate = new Date(data.endDate);
-        this.endDateInfoEl.textContent = `Mandate ends on ${endDate.toLocaleDateString('fr-FR')}`;
-
-        this.leaderPhotoEl.style.opacity = 0.5;
-        this.leaderPhotoEl.style.filter = 'blur(5px)';
-
-        // Pre-loads the new image into memory
+        this.leaderPhotoEl.style.opacity = 0;
+        
         const img = new Image();
         img.src = data.photoUrl;
-
-        // When the image is fully loaded
         img.onload = () => {
             this.leaderPhotoEl.src = data.photoUrl;
             this.leaderPhotoEl.style.opacity = 1;
-            this.leaderPhotoEl.style.filter = 'blur(0)';
         };
-
         img.onerror = () => {
             this.leaderPhotoEl.src = 'https://via.placeholder.com/150';
             this.leaderPhotoEl.style.opacity = 1;
-            this.leaderPhotoEl.style.filter = 'blur(0)';
         };
 
-        this.updateCountdown(endDate);
-        this.countdownInterval = setInterval(() => this.updateCountdown(endDate), 1000);
+        // --- NOUVELLE LOGIQUE D'AFFICHAGE CONDITIONNEL ---
+        if (data.termType === 'unlimited') {
+            // Cas du mandat illimité
+            this.timerEl.style.display = 'block';
+            this.fullCountdownEl.style.display = 'none';
+            this.endDateInfoEl.style.display = 'none';
 
-        this.loader.classList.add('hidden');
+            this.secondsLeftEl.textContent = '∞'; // Symbole infini
+            this.secondsLeftEl.classList.add('unlimited-term'); // Classe pour l'animation
+            this.secondsLeftEl.classList.remove('countdown-numbers');
+            
+            this.countdownLabelEl.textContent = "Mandat à durée indéterminée";
+            
+        } else {
+            // Cas du mandat à durée fixe (logique existante)
+            this.timerEl.style.display = 'block';
+            this.fullCountdownEl.style.display = 'block';
+            this.endDateInfoEl.style.display = 'block';
+
+            const endDate = new Date(data.endDate);
+            this.endDateInfoEl.textContent = `Fin du mandat prévue le ${endDate.toLocaleDateString('fr-FR')}`;
+
+            this.updateCountdown(endDate);
+            this.countdownInterval = setInterval(() => this.updateCountdown(endDate), 1000);
+        }
+
         this.countdownContainer.classList.remove('hidden');
     }
 
@@ -269,11 +239,12 @@ class CountdownApp {
         if (totalSecondsLeft <= 0) {
             clearInterval(this.countdownInterval);
             this.secondsLeftEl.textContent = "0";
-            this.countdownLabelEl.textContent = "The mandate is over !";
+            this.countdownLabelEl.textContent = "Le mandat est terminé !";
             this.fullCountdownEl.textContent = "";
             return;
         }
 
+        this.countdownLabelEl.textContent = "secondes restantes"; // On s'assure que le label est correct
         this.secondsLeftEl.textContent = totalSecondsLeft.toLocaleString('fr-FR');
         
         const days = Math.floor(totalSecondsLeft / 3600 / 24);
@@ -283,3 +254,8 @@ class CountdownApp {
         this.fullCountdownEl.textContent = `${days}j ${hours}h ${minutes}m ${seconds}s`;
     }
 }
+
+// Initialisation de l'application
+document.addEventListener('DOMContentLoaded', () => {
+    new CountdownApp();
+});

@@ -59,17 +59,16 @@ select {
 
 #timer {
     margin: 20px 0;
+    background-color: red;
 }
 
 .countdown-numbers {
     font-family: 'Roboto Mono', monospace;
-    /* ANCIENNE LIGNE : font-size: 4rem; */
-    /* NOUVELLE LIGNE : */
     font-size: clamp(2.5rem, 10vw, 4.5rem);
     font-weight: 700;
     color: #4CAF50;
     letter-spacing: -2px;
-    word-wrap: break-word; /* On ajoute cette sécurité aussi */
+    word-wrap: break-word; 
 }
 
 .countdown-label {
@@ -89,7 +88,6 @@ select {
     display: none;
 }
 
-/* Simple spinner pour le chargement */
 #loading-spinner {
     border: 8px solid #f3f3f3;
     border-top: 8px solid #3498db;
@@ -105,24 +103,57 @@ select {
     100% { transform: rotate(360deg); }
 }
 
-/* Pour les écrans jusqu'à 600px de large */
 @media (max-width: 600px) {
     .app-container {
-        /* On réduit les espacements pour gagner de la place */
-        padding: 20px 15px; /* 20px en haut/bas, 15px sur les côtés */
-        width: 95%; /* On prend un peu plus de place sur les petits écrans */
+        padding: 20px 15px; 
+        width: 95%; 
         margin-top: 15px;
         margin-bottom: 15px;
     }
 
     #leader-photo {
-        /* On réduit la taille de la photo */
         width: 100px; 
         height: 100px;
     }
     
     select {
-        /* On peut légèrement réduire la police du sélecteur */
         font-size: 0.9rem;
     }
+}
+
+.unlimited-term {
+    font-family: 'Roboto Mono', monospace;
+    font-size: clamp(5rem, 15vw, 8rem); 
+    font-weight: 700;
+    color: #ffd700; 
+    line-height: 1;
+    margin-bottom: 10px;
+    animation: pulse 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+        text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 1;
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.7;
+        text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+}
+
+#leader-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #4CAF50;
+    transition: opacity 0.5s ease-in-out; 
 }
