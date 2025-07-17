@@ -4,10 +4,10 @@ const translations = {
         title: "Presidential Countdown",
         subtitle: "How much time does he/she have left?",
         country_select_placeholder: "-- Choose a country --",
-        days: "Days",
-        hours: "Hours",
-        minutes: "Minutes",
-        seconds: "Seconds",
+        days: "Days",      days_short: "Days",
+        hours: "Hours",    hours_short: "Hrs",
+        minutes: "Minutes",  minutes_short: "Mins",
+        seconds: "Seconds",  seconds_short: "Secs",
         unlimited_term: "Unlimited term",
         end_date_prefix: "End of term scheduled for",
         term_ended: "The term is over!",
@@ -37,10 +37,10 @@ const translations = {
         title: "Compteur Présidentiel",
         subtitle: "Combien de temps lui reste-t-il ?",
         country_select_placeholder: "-- Choisissez un pays --",
-        days: "Jours",
-        hours: "Heures",
-        minutes: "Minutes",
-        seconds: "Secondes",
+        days: "Jours",     days_short: "Jrs",
+        hours: "Heures",   hours_short: "Hrs",
+        minutes: "Minutes",  minutes_short: "Min",
+        seconds: "Secondes", seconds_short: "Sec",
         unlimited_term: "Mandat à durée indéterminée",
         end_date_prefix: "Fin du mandat prévue le",
         term_ended: "Le mandat est terminé !",
@@ -135,7 +135,17 @@ class CountdownApp {
         const elements = document.querySelectorAll('[data-i18n-key]');
         elements.forEach(el => {
             const key = el.getAttribute('data-i18n-key');
-            el.textContent = this.getTranslation(key);
+            const translation = this.getTranslation(key);
+            
+            const longLabel = el.querySelector('.label-long');
+            const shortLabel = el.querySelector('.label-short');
+    
+            if (longLabel && shortLabel) {
+                longLabel.textContent = translation;
+                shortLabel.textContent = this.getTranslation(`${key}_short`); 
+            } else {
+                el.textContent = translation;
+            }
         });
     }
     

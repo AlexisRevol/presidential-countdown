@@ -113,41 +113,51 @@ select:focus {
     font-weight: 700;
 }
 
-/* --- NOUVEAU COMPTEUR EN GRILLE --- */
 #countdown-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+    gap: clamp(10px, 4vw, 20px); 
+    
     margin-bottom: 15px;
 }
 
+
 .time-block {
     background: rgba(0,0,0,0.2);
-    padding: 15px 10px;
+    padding: clamp(10px, 3vw, 15px);
+    
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    min-width: 70px; /* Assure une taille minimale */
+    justify-content: center; 
 }
+
 
 .time-block .number {
     font-family: var(--font-mono);
-    font-size: clamp(2rem, 8vw, 3rem);
+    font-size: clamp(1.8rem, 8vw, 3rem);
     font-weight: 700;
     color: var(--accent-primary);
     line-height: 1;
 }
 
 .time-block .label {
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 2vw, 0.8rem);
+    
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-top: 5px;
+    word-break: break-word; 
 }
 
-/* --- AFFICHAGE MANDAT INDÉTERMINÉ --- */
+.time-block .label .label-short {
+    display: none;
+}
+.time-block .label .label-long {
+    display: inline; 
+}
+
 #unlimited-term-display {
     padding: 30px 0;
     animation: fadeIn 1s ease-in-out;
@@ -160,7 +170,7 @@ select:focus {
     color: var(--accent-secondary);
     line-height: 1;
     margin-bottom: 10px;
-    display: inline-block; /* Pour que l'animation fonctionne bien */
+    display: inline-block; 
     animation: pulse 2.5s infinite ease-in-out;
 }
 
@@ -174,11 +184,10 @@ select:focus {
     color: var(--text-secondary);
     font-style: italic;
     font-size: 0.9rem;
-    min-height: 1.2em; /* Empêche le saut de layout */
+    min-height: 1.2em; 
 }
 
 
-/* --- UTILITAIRES & ANIMATIONS --- */
 .hidden {
     display: none !important;
 }
@@ -214,14 +223,16 @@ select:focus {
     .app-container {
         padding: 25px 20px;
     }
-    #countdown-grid {
-        gap: 10px;
-    }
-    .time-block {
-        padding: 10px 5px;
-    }
+    
     #leader-photo {
         width: 120px;
         height: 120px;
+    }
+
+    .time-block .label .label-short {
+        display: inline;
+    }
+    .time-block .label .label-long {
+        display: none;
     }
 }
