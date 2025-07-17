@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en"> 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Presidential Countdown</title>
+    
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,26 +12,43 @@
 </head>
 <body>
     <div class="app-container">
-        <h1>Presidential Countdown</h1>
-        <p>How much time does he have left?</p>
+        <h1 data-i18n-key="title">Presidential Countdown</h1>
+        <p class="subtitle" data-i18n-key="subtitle">How much time does he have left?</p>
         
         <select id="country-select">
-            <option value="">-- Select a country --</option>
-            <!-- Options added by JavaScript -->
+            <!-- Generate by JS -->
         </select>
 
         <div id="countdown-container" class="hidden">
             <div id="leader-info">
-                <img id="leader-photo" src="" alt="President's photo">
+                <img id="leader-photo" src="" alt="Photo of the leader">
                 <h2 id="leader-name"></h2>
             </div>
-            <div id="timer">
-                <p id="seconds-left" class="countdown-numbers"></p>
-                <p id="countdown-label" class="countdown-label">seconds left</p>
+
+            <div id="countdown-grid">
+                <div class="time-block">
+                    <span class="number" id="days">0</span>
+                    <span class="label" data-i18n-key="days">Days</span>
+                </div>
+                <div class="time-block">
+                    <span class="number" id="hours">0</span>
+                    <span class="label" data-i18n-key="hours">Hours</span>
+                </div>
+                <div class="time-block">
+                    <span class="number" id="minutes">0</span>
+                    <span class="label" data-i18n-key="minutes">Minutes</span>
+                </div>
+                <div class="time-block">
+                    <span class="number" id="seconds">0</span>
+                    <span class="label" data-i18n-key="seconds">Seconds</span>
+                </div>
             </div>
-            <div id="full-countdown">
-                <!-- Detailled coutdown (j/h/m/s) -->
+
+            <div id="unlimited-term-display" class="hidden">
+                <span id="infinity-symbol">∞</span>
+                <p id="unlimited-label" data-i18n-key="unlimited_term">Unlimited term</p>
             </div>
+
             <small id="end-date-info"></small>
         </div>
 
