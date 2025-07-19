@@ -4,10 +4,11 @@
 
 A web application that displays a real-time countdown to the end of a head of state's term.
 
+<img src="https://AlexisRevol.github.io/presidential-countdown/demo_screenshot.png" alt="Application Screenshot" width="400"/>
+
 **➡️ [Try it](https://AlexisRevol.github.io/presidential-countdown)** 
 https://AlexisRevol.github.io/presidential-countdown
 
-<img src="https://AlexisRevol.github.io/presidential-countdown/demo_screenshot2.png" alt="Application Screenshot" width="400"/>
 
 ---
 
